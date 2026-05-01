@@ -1509,15 +1509,15 @@ function initLetterScene() {
    MEMORY SLIDESHOW
    ============================================================ */
 const slides = [
-  { emoji: 'WhatsApp Image 2026-04-13 at 11.56.44 PM.jpeg', text: 'The day our story began — a moment I will cherish forever.' },
+ { emoji: 'WhatsApp Image 2026-04-13 at 11.56.44 PM.jpeg', text: 'The day our story began — a moment I will cherish forever.' },
   { emoji: '🌸', text: 'Every spring reminds me of your smile and new beginnings together.' },
   { emoji: '☀️', text: 'Lazy afternoons with you feel like golden hour, always.' },
   { emoji: '🌙', text: 'Stargazing nights where words weren\'t needed — just you and me.' },
   { emoji: '🎂', text: 'Every birthday makes you more wonderful than the last.' },
   { emoji: '💫', text: 'A thousand little moments — each one perfectly, beautifully ours.' }
   
-
 ];
+const slideDots = document.getElementById('slide-dots');
 
 let currentSlide = 0;
 let slideInterval = null;
@@ -1534,18 +1534,29 @@ function initSlideshowScene() {
   slides.forEach((s, i) => {
     const slide = document.createElement('div');
     slide.className = 'slide' + (i === 0 ? ' active' : '');
-    slide.innerHTML = `
-      <div class="slide-placeholder">
-        <div class="slide-placeholder-icon">${s.emoji}</div>
-        <div class="slide-placeholder-text">${s.text}</div>
-      </div>
-    `;
+    
+    if (s.img) {
+      // If image exists, use it
+      slide.innerHTML = `<img src="${s.img}" class="slide-img" alt="Memory">`;
+    } else {
+      // Fallback to placeholder if no image
+      slide.innerHTML = `
+        <div class="slide-placeholder">
+          <div class="slide-placeholder-icon">${s.emoji}</div>
+          <div class="slide-placeholder-text">${s.text}</div>
+        </div>
+      `;
+    }
+    
+    // Add caption
+    if (s.caption) {
+      const caption = document.createElement('div');
+      caption.className = 'slide-caption';
+      caption.textContent = s.caption;
+      slide.appendChild(caption);
+    }
+    
     container.appendChild(slide);
-
-    const dot = document.createElement('button');
-    dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
-    dot.onclick = () => gotoSlide(i);
-    dotsEl.appendChild(dot);
   });
 
   // Petals
