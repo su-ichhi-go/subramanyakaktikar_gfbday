@@ -105,34 +105,40 @@
 
           source.connect(analyser);
 
-          const dataArray = new Uint8Array(analyser.frequencyBinCount);
+          const freqArray = new Uint8Array(analyser.frequencyBinCount);
+          const timeArray = new Uint8Array(analyser.frequencyBinCount);
 
           let blown = false;
 
           function detectBlow() {
-            analyser.getByteFrequencyData(dataArray);
+            analyser.getByteFrequencyData(freqArray);
+            analyser.getByteTimeDomainData(timeArray);
 
             let highFreqSum = 0;
             let lowFreqSum = 0;
+            let rmsSum = 0;
 
-            const midpoint = dataArray.length / 2;
-
-            for (let i = 0; i < dataArray.length; i++) {
+            const midpoint = freqArray.length / 2;
+            for (let i = 0; i < freqArray.length; i++) {
               if (i < midpoint) {
-                lowFreqSum += dataArray[i];
+                lowFreqSum += freqArray[i];
               } else {
-                highFreqSum += dataArray[i];
+                highFreqSum += freqArray[i];
               }
+              const normalized = (timeArray[i] - 128) / 128;
+              rmsSum += normalized * normalized;
             }
 
-            const highAvg = highFreqSum / (dataArray.length / 2);
-            const lowAvg = lowFreqSum / (dataArray.length / 2);
-
+            const highAvg = highFreqSum / (freqArray.length / 2);
+            const lowAvg = lowFreqSum / (freqArray.length / 2);
+            const rms = Math.sqrt(rmsSum / timeArray.length) * 100;
             const ratio = highAvg / (lowAvg + 1);
 
-            const BLOW_RATIO_THRESHOLD = 0.5;
+            const BLOW_RATIO_THRESHOLD = 0.18;
+            const BLOW_RMS_THRESHOLD = 8;
+            const BLOW_LOW_THRESHOLD = 18;
 
-            if (ratio > BLOW_RATIO_THRESHOLD && !blown) {
+            if (!blown && rms > BLOW_RMS_THRESHOLD && ratio > BLOW_RATIO_THRESHOLD && lowAvg > BLOW_LOW_THRESHOLD) {
               blown = true;
               blowOutCandles();
             }
