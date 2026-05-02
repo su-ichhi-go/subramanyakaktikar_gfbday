@@ -429,16 +429,28 @@ body {
 }
 
 .slide-dots {
-  display: flex; gap: 0.6rem; justify-content: center;
+  display: flex; gap: 0.5rem; justify-content: center;
   margin-top: 1.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.4rem 0;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+.slide-dots::-webkit-scrollbar {
+  display: none;
 }
 .slide-dot {
-  width: 12px; height: 12px;
+  flex: 0 0 auto;
+  width: 14px; height: 14px;
+  min-width: 14px; min-height: 14px;
   border-radius: 50%;
   background: rgba(255, 182, 193, 0.4);
   cursor: pointer;
+  touch-action: manipulation;
   transition: all 0.3s ease;
   border: 2px solid rgba(255, 182, 193, 0.3);
+  touch-action: manipulation;
 }
 .slide-dot.active {
   background: #FF69B4;
@@ -458,6 +470,7 @@ body {
   width: 50px; height: 50px;
   border-radius: 50%;
   cursor: pointer;
+  touch-action: manipulation;
   transition: all 0.3s ease;
   backdrop-filter: blur(8px);
 }
@@ -1048,6 +1061,10 @@ body {
     <div class="slide-container" id="slide-container">
       <!-- Slides injected by JS -->
     </div>
+    <div class="slide-nav">
+      <button class="slide-btn" type="button" id="prev-slide" aria-label="Previous slide">‹</button>
+      <button class="slide-btn" type="button" id="next-slide" aria-label="Next slide">›</button>
+    </div>
     <div class="slide-dots" id="slide-dots"></div>
   </div>
   <div class="scene-footer" style="position:absolute;bottom:1.5rem;width:100%;">
@@ -1634,11 +1651,29 @@ function initSlideshowScene() {
   // Auto slide
   slideInterval = setInterval(() => changeSlide(1), 4500);
 
-  // Touch swipe
-  container.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-  container.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - touchStartX;
+  // Previous / next buttons
+  const prevBtn = document.getElementById('prev-slide');
+  const nextBtn = document.getElementById('next-slide');
+  if (prevBtn) prevBtn.addEventListener('click', () => changeSlide(-1));
+  if (nextBtn) nextBtn.addEventListener('click', () => changeSlide(1));
+
+  // Touch and pointer swipe support
+  let pointerStartX = null;
+  const startSwipe = x => { pointerStartX = x; };
+  const endSwipe = x => {
+    if (pointerStartX === null) return;
+    const dx = x - pointerStartX;
+    pointerStartX = null;
     if (Math.abs(dx) > 40) changeSlide(dx < 0 ? 1 : -1);
+  };
+
+  container.addEventListener('touchstart', e => startSwipe(e.touches[0].clientX), { passive: true });
+  container.addEventListener('touchend', e => endSwipe(e.changedTouches[0].clientX));
+  container.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'touch' || e.pointerType === 'pen') startSwipe(e.clientX);
+  });
+  container.addEventListener('pointerup', e => {
+    if (e.pointerType === 'touch' || e.pointerType === 'pen') endSwipe(e.clientX);
   });
 
   // 3D tilt on hover
