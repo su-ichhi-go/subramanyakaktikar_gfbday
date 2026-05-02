@@ -1560,7 +1560,6 @@ const slides = [
   { img: 'images/image49.jpeg', text: 'The day our story began — a moment I will cherish forever.' },
   { img: 'images/image50.jpeg', text: 'Every spring reminds me of your smile and new beginnings together.' }
 ];
-const slideDots = document.getElementById('slide-dots');
 
 let currentSlide = 0;
 let slideInterval = null;
@@ -1579,27 +1578,33 @@ function initSlideshowScene() {
     slide.className = 'slide' + (i === 0 ? ' active' : '');
     
     if (s.img) {
-      // If image exists, use it
       slide.innerHTML = `<img src="${s.img}" class="slide-img" alt="Memory">`;
     } else {
-      // Fallback to placeholder if no image
       slide.innerHTML = `
         <div class="slide-placeholder">
-          <div class="slide-placeholder-icon">${s.emoji}</div>
-          <div class="slide-placeholder-text">${s.text}</div>
+          <div class="slide-placeholder-icon">${s.emoji || '📸'}</div>
+          <div class="slide-placeholder-text">${s.text || 'No image available.'}</div>
         </div>
       `;
     }
-    
-    // Add caption
-    if (s.caption) {
+
+    const captionText = s.caption || s.text;
+    if (captionText) {
       const caption = document.createElement('div');
       caption.className = 'slide-caption';
-      caption.textContent = s.caption;
+      caption.textContent = captionText;
       slide.appendChild(caption);
     }
-    
+
     container.appendChild(slide);
+
+    if (dotsEl) {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => gotoSlide(i));
+      dotsEl.appendChild(dot);
+    }
   });
 
   // Petals
