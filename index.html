@@ -369,15 +369,17 @@ body {
 
 .slide-container {
   position: relative;
-  width: 100%; max-width: 700px;
+  width: 100%; max-width: 720px;
   margin: 0 auto;
   aspect-ratio: 4/3;
+  min-height: 320px;
   border-radius: 24px;
   overflow: hidden;
   box-shadow: var(--soft-shadow-lg);
   border: 2px solid rgba(255, 182, 193, 0.2);
   backdrop-filter: blur(8px);
   touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .slide {
@@ -436,6 +438,7 @@ body {
   padding: 0.4rem 0;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x;
+  scroll-snap-type: x mandatory;
 }
 .slide-dots::-webkit-scrollbar {
   display: none;
@@ -450,12 +453,16 @@ body {
   touch-action: manipulation;
   transition: all 0.3s ease;
   border: 2px solid rgba(255, 182, 193, 0.3);
-  touch-action: manipulation;
+  scroll-snap-align: center;
 }
 .slide-dot.active {
   background: #FF69B4;
   box-shadow: 0 0 15px rgba(255, 182, 193, 0.6);
   transform: scale(1.2);
+}
+.slide-dot:focus-visible {
+  outline: 2px solid rgba(255, 182, 193, 0.85);
+  outline-offset: 3px;
 }
 
 .slide-nav {
@@ -872,6 +879,16 @@ body {
     min-height: 44px; /* iOS recommended touch target */
     min-width: 44px;
   }
+  
+  /* Slideshow mobile adjustments */
+  .slide-container { aspect-ratio: auto; min-height: 260px; }
+  .slide-caption {
+    padding: 1.2rem 1rem 1rem;
+    font-size: 0.95rem;
+  }
+  .slide-nav { gap: 0.75rem; }
+  .slide-btn { width: 44px; height: 44px; font-size: 1.2rem; }
+  .slide-dots { margin-top: 1rem; }
   
   /* Scene adjustments */
   .scene { padding: 1rem; }
@@ -1602,7 +1619,7 @@ function initSlideshowScene() {
     slide.className = 'slide' + (i === 0 ? ' active' : '');
     
     if (s.img) {
-      slide.innerHTML = `<img src="${s.img}" class="slide-img" alt="Memory">`;
+      slide.innerHTML = `<img src="${s.img}" class="slide-img" alt="Memory" loading="lazy">`;
     } else {
       slide.innerHTML = `
         <div class="slide-placeholder">
@@ -1626,7 +1643,17 @@ function initSlideshowScene() {
       const dot = document.createElement('button');
       dot.type = 'button';
       dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+      dot.setAttribute('role', 'button');
+      dot.setAttribute('tabindex', '0');
+      if (i === 0) dot.setAttribute('aria-current', 'true');
       dot.addEventListener('click', () => gotoSlide(i));
+      dot.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          gotoSlide(i);
+        }
+      });
       dotsEl.appendChild(dot);
     }
   });
@@ -1659,12 +1686,16 @@ function initSlideshowScene() {
 
   // Touch and pointer swipe support
   let pointerStartX = null;
-  const startSwipe = x => { pointerStartX = x; };
+  const startSwipe = x => {
+    pointerStartX = x;
+    clearInterval(slideInterval);
+  };
   const endSwipe = x => {
     if (pointerStartX === null) return;
     const dx = x - pointerStartX;
     pointerStartX = null;
     if (Math.abs(dx) > 40) changeSlide(dx < 0 ? 1 : -1);
+    slideInterval = setInterval(() => changeSlide(1), 4500);
   };
 
   container.addEventListener('touchstart', e => startSwipe(e.touches[0].clientX), { passive: true });
@@ -1674,6 +1705,12 @@ function initSlideshowScene() {
   });
   container.addEventListener('pointerup', e => {
     if (e.pointerType === 'touch' || e.pointerType === 'pen') endSwipe(e.clientX);
+  });
+
+  container.addEventListener('pointerenter', () => clearInterval(slideInterval));
+  container.addEventListener('pointerleave', () => {
+    clearInterval(slideInterval);
+    slideInterval = setInterval(() => changeSlide(1), 4500);
   });
 
   // 3D tilt on hover
@@ -1691,11 +1728,15 @@ function initSlideshowScene() {
 function gotoSlide(n) {
   const allSlides = document.querySelectorAll('.slide');
   const allDots = document.querySelectorAll('.slide-dot');
+  if (!allSlides.length || !allDots.length) return;
   allSlides[currentSlide].classList.remove('active');
   allDots[currentSlide].classList.remove('active');
+  allDots[currentSlide].removeAttribute('aria-current');
   currentSlide = (n + slides.length) % slides.length;
   allSlides[currentSlide].classList.add('active');
   allDots[currentSlide].classList.add('active');
+  allDots[currentSlide].setAttribute('aria-current', 'true');
+  allDots[currentSlide].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   clearInterval(slideInterval);
   slideInterval = setInterval(() => changeSlide(1), 4500);
 }
