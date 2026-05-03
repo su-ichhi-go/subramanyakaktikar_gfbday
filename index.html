@@ -426,10 +426,43 @@ body {
   width: 100%; height: 100%; object-fit: cover;
   animation: kenBurns 8s ease-in-out infinite alternate;
   will-change: transform; display: block;
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  perspective: 1000px;
+  cursor: pointer;
+  position: relative;
+}
+
+.slide-img.poker-flip {
+  animation-play-state: paused;
+  transform-style: preserve-3d;
+  animation: none;
+}
+
+.slide-img.flipping {
+  animation: pokerFlip 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.slide-card-back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  background: linear-gradient(135deg, rgba(255,182,193,0.9), rgba(200,164,245,0.9));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(1.8rem, 6vw, 3rem);
+  color: #FF69B4; text-shadow: 0 4px 15px rgba(255,107,157,0.4);
+  border-radius: 12px;
 }
 @keyframes kenBurns {
   0%   { transform: scale(1) translate(0, 0); }
   100% { transform: scale(1.12) translate(-2%, -2%); }
+}
+
+@keyframes pokerFlip {
+  0%   { transform: rotateY(0deg) scale(1); }
+  25%  { transform: rotateY(-90deg) scale(1.02); }
+  50%  { transform: rotateY(-90deg) scale(0.95); }
+  75%  { transform: rotateY(90deg) scale(1.02); }
+  100% { transform: rotateY(0deg) scale(1.05); }
 }
 @media (max-width: 768px) {
   .slide-img { animation: none; }
@@ -798,7 +831,7 @@ body {
     <div class="slide-dots" id="slide-dots" role="tablist" aria-label="Slide navigation"></div>
   </div>
   <div class="scene-footer" style="position:absolute;bottom:1.5rem;width:100%;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-    <button class="btn-interactive" type="button" id="btn-poker" aria-label="More Photos — Poker Card Gallery">
+    <button class="btn-interactive" type="button" id="btn-poker" aria-label="Open Poker Card Photo Gallery">
       More Photos 🎴
     </button>
     <button class="btn-interactive" type="button" id="btn-next-surprise" aria-label="Next Surprise">
@@ -1056,7 +1089,8 @@ function wireBtn(id, action) {
 // ── Scene navigation buttons ──
 wireBtn('btn-begin',         () => goToScene('letter'));
 wireBtn('btn-memories',      () => goToScene('slideshow'));
-wireBtn('btn-poker',         () => { window.location.href = 'poker-cards.html'; });
+// Poker button removed - animation integrated into slides
+wireBtn('btn-poker',         () => { window.open('poker-cards.html', '_blank'); });
 wireBtn('btn-next-surprise', () => goToScene('thankyou'));
 wireBtn('btn-last-surprise', () => goToScene('surprise'));
 wireBtn('restart-btn',       () => goToScene('countdown'));
@@ -1348,18 +1382,30 @@ function initLetterScene() {
    MEMORY SLIDESHOW
    ============================================================ */
 const slides = [
-  { img: 'images/image1.jpeg',  text: 'The day our story began — a moment I will cherish forever.' },
-  { img: 'images/image2.jpeg',  text: 'A smile that made the whole world brighter.' },
-  { img: 'images/image3.jpeg',  text: 'Laughter that echoed through the happiest days.' },
-  { img: 'images/image4.jpeg',  text: 'Side by side, always.' },
-  { img: 'images/image5.jpeg',  text: 'That golden afternoon we never wanted to end.' },
-  { img: 'images/image6.jpeg',  text: 'Every little adventure with you is magic.' },
-  { img: 'images/image7.jpeg',  text: 'The way you look at the world makes me see it differently.' },
-  { img: 'images/image8.jpeg',  text: 'You make ordinary days extraordinary.' },
-  { img: 'images/image9.jpeg',  text: 'Together is my favourite place to be.' },
-  { img: 'images/image10.jpeg', text: 'This memory lives in my heart forever.' },
-  { img: 'images/image11.jpeg', text: 'The best moments are always with you.' },
-  { img: 'images/image12.jpeg', text: 'Every photo is a love letter in disguise.' }
+  { img: 'images/image1.jpeg',  text: 'The day our story began — a moment I will cherish forever. 💕' },
+  { img: 'images/image2.jpeg',  text: 'A smile that made the whole world brighter. ✨' },
+  { img: 'images/image3.jpeg',  text: 'Laughter that echoed through the happiest days. 😄' },
+  { img: 'images/image4.jpeg',  text: 'Side by side, always. 🤝' },
+  { img: 'images/image5.jpeg',  text: 'That golden afternoon we never wanted to end. 🌅' },
+  { img: 'images/image6.jpeg',  text: 'Every little adventure with you is magic. 🪄' },
+  { img: 'images/image7.jpeg',  text: 'The way you look at the world makes me see it differently. 🌍' },
+  { img: 'images/image8.jpeg',  text: 'You make ordinary days extraordinary. ⭐' },
+  { img: 'images/image9.jpeg',  text: 'Together is my favourite place to be. 🏠' },
+  { img: 'images/image10.jpeg', text: 'This memory lives in my heart forever. ❤️' },
+  { img: 'images/image11.jpeg', text: 'The best moments are always with you. 🌹' },
+  { img: 'images/image12.jpeg', text: 'Every photo is a love letter in disguise. 📸' },
+  { img: 'images/image13.jpeg', text: 'A quiet day made unforgettable. 🌿' },
+  { img: 'images/image14.jpeg', text: 'Those late-night talks under the stars. ⭐' },
+  { img: 'images/image15.jpeg', text: 'Joy in every simple smile. 😊' },
+  { img: 'images/image16.jpeg', text: 'The warmth of your hand in mine. 👐' },
+  { img: 'images/image17.jpeg', text: 'A day full of laughter and light. ☀️' },
+  { img: 'images/image18.jpeg', text: 'Tiny moments that meant everything. 💎' },
+  { img: 'images/image19.jpeg', text: 'A perfect memory we will keep forever. 🕊️' },
+  { img: 'images/image20.jpeg', text: 'Sunsets, stories, and us. 🌇' },
+  { img: 'images/image21.jpeg', text: 'Captured happiness. 📷' },
+  { img: 'images/image22.jpeg', text: 'Moments like these. 🧡' },
+  { img: 'images/image23.jpeg', text: 'Forever in my heart. 💖' },
+  { img: 'images/image24.jpeg', text: 'Our beautiful journey. 🌈' }
 ];
 
 let currentSlide = 0;
@@ -1371,11 +1417,18 @@ function initSlideshowScene() {
   if (slideshowInitialized) return;
   slideshowInitialized = true;
 
-  const maxSlides = isMobile ? 8 : 12;
+    const maxSlides = isMobile ? 12 : 24;
   slideSources = slides.slice(0, Math.min(slides.length, maxSlides));
 
   const container = document.getElementById('slide-container');
   const dotsEl    = document.getElementById('slide-dots');
+
+// Poker card back element
+  const cardBack = document.createElement('div');
+  cardBack.className = 'slide-card-back';
+  cardBack.textContent = '✨ Tap for Magic ✨';
+  cardBack.style.display = 'none';
+  container.appendChild(cardBack);
 
   slideSources.forEach((s, i) => {
     // Slide
@@ -1388,7 +1441,11 @@ function initSlideshowScene() {
       img.className = 'slide-img';
       img.loading   = 'lazy';
       img.decoding  = 'async';
-      img.onerror   = function() { this.style.display = 'none'; ph.style.display = 'flex'; };
+      // Images always visible - no placeholder needed
+      img.onerror = function() { 
+        console.warn('Image failed to load:', this.src);
+        this.style.opacity = '0.8'; // Fallback dim instead of hide
+      };
       slide.appendChild(img);
       const ph = document.createElement('div');
       ph.className = 'slide-placeholder';
@@ -1453,7 +1510,7 @@ function initSlideshowScene() {
     if (Math.abs(dx) > 40) changeSlide(dx < 0 ? 1 : -1);
   });
 
-  // Pointer swipe (mouse drag)
+// Pointer swipe + poker flip on image click
   if (!isTouch) {
     let ptrX = null;
     container.addEventListener('pointerdown', e => { ptrX = e.clientX; }, { passive: true });
@@ -1477,6 +1534,52 @@ function initSlideshowScene() {
     container.addEventListener('mouseenter', () => clearInterval(slideInterval));
     container.addEventListener('mouseleave', () => startAutoSlide());
   }
+
+// Poker card flip animation - FULLY IMPLEMENTED
+  // cardBack already declared above - ready for use
+  
+  function triggerPokerFlip(img) {
+    img.classList.add('poker-flip', 'flipping');
+    cardBack.style.display = 'flex';
+    cardBack.style.zIndex = '10';
+    
+    setTimeout(() => {
+      img.classList.remove('flipping');
+      cardBack.style.display = 'none';
+      img.classList.remove('poker-flip');
+    }, 1200);
+    
+    // Bonus hearts on flip
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => {
+        const h = document.createElement('div');
+        h.className = 'heart-float';
+        h.textContent = ['💖','✨','💕','🌟'][Math.floor(Math.random()*4)];
+        h.style.cssText = `
+          left: ${img.offsetLeft + img.offsetWidth/2}px;
+          top: ${img.offsetTop + img.offsetHeight/2}px;
+          position: absolute; z-index: 20;
+          --dur: ${1.2 + Math.random()}s;
+          --size: ${1.2 + Math.random()}rem;
+          --rot: ${(Math.random()-0.5)*30}deg;
+        `;
+        container.parentElement.appendChild(h);
+        setTimeout(() => h.remove(), 2500);
+      }, i * 80);
+    }
+  }
+
+  container.addEventListener('pointerup', e => {
+    const img = e.target.closest('.slide-img');
+    if (!img || e.target.closest('.slide-btn, .slide-dot')) return;
+    e.stopPropagation();
+    triggerPokerFlip(img);
+  }, { passive: true });
+
+  container.addEventListener('click', e => {
+    const img = e.target.closest('.slide-img');
+    if (img) triggerPokerFlip(img);
+  });
 
   // Petals
   const scene = document.getElementById('scene-slideshow');
