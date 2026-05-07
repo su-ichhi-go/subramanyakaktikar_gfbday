@@ -6,13 +6,13 @@ A beautiful, interactive birthday celebration with full cross-platform button su
 
 ### Windows
 1. Double-click `start_server.bat`
-2. Open your browser: `http://localhost:8000/newww.html`
+2. Open your browser: `http://localhost:8000/index.html`
 
 ### macOS / Linux
 ```bash
 cd /path/to/birthday-website
 python -m http.server 8000
-# Open: http://localhost:8000/newww.html
+# Open: http://localhost:8000/index.html
 ```
 
 ### iOS / Android
@@ -23,7 +23,7 @@ python -m http.server 8000
 
 ```
 /
-├── newww.html          ← Main experience (all scenes)
+├── index.html          ← Main experience (all scenes)
 ├── poker-cards.html    ← Poker card photo gallery
 ├── newbday.html        ← Birthday cake (mic blow detection)
 ├── style.css           ← Pixel-art cake animation keyframes
