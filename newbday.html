@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#feefe5" />
+    <title>Birthday Cake 🎂</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet" />
+    <style>
+      /* ============================================================
+         RESET & BASE
+         ============================================================ */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --bg: #feefe5;
+        --text: #333;
+        --accent: #ff69b4;
+      }
+
+      html, body {
+        height: 100%;
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: 'Pixelify Sans', sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        touch-action: manipulation;
+        overflow: hidden;
+      }
+
+      /* ============================================================
+         REUSABLE INTERACTIVE BUTTON
+         ============================================================ */
+      .btn-interactive {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        cursor: pointer;
+        font-family: 'Pixelify Sans', sans-serif;
+        min-height: 48px;
+        min-width: 48px;
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        background: #ff69b4;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        box-shadow: 0 4px 16px rgba(255,105,180,0.3);
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-user-select: none;
+        outline: none;
+        transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease;
+        will-change: transform;
+      }
+
+      .btn-interactive:active,
+      .btn-interactive[data-pressed="true"] {
+        transform: scale(0.94) !important;
+        box-shadow: 0 2px 6px rgba(255,105,180,0.2) !important;
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        .btn-interactive:hover {
+          transform: translateY(-2px) scale(1.03);
+          box-shadow: 0 8px 24px rgba(255,105,180,0.4);
+        }
+      }
+
+      .btn-interactive:focus-visible {
+        outline: 2px solid #ff69b4;
+        outline-offset: 3px;
+      }
+
+      .btn-interactive:disabled {
+        opacity: 0.45;
+        pointer-events: none;
+      }
+
+      /* Ripple */
+      .btn-ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.45);
+        transform: scale(0);
+        animation: rippleAnim 0.52s linear forwards;
+        pointer-events: none;
+      }
+      @keyframes rippleAnim { to { transform: scale(4.5); opacity: 0; } }
+
+      /* ============================================================
+         CONTAINER
+         ============================================================ */
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 2rem 1rem;
+        gap: 1.5rem;
+      }
+
+      /* ============================================================
+         BIRTHDAY TEXT
+         ============================================================ */
+      #birthdayText { color: var(--text); }
+
+      #mainTitle {
+        font-size: clamp(1.4rem, 5vw, 2rem);
+        font-family: 'Pixelify Sans', sans-serif;
+        margin-bottom: 0.5rem;
+        color: var(--text);
+      }
+      #subTitle {
+        font-size: clamp(0.9rem, 3vw, 1.1rem);
+        font-family: 'Pixelify Sans', sans-serif;
+        color: #666;
+        transition: color 0.4s ease;
+      }
+
+      /* ============================================================
+         CAKE (pixel-art via CSS box-shadow — preserved from original)
+         ============================================================ */
+      .cake-container { display: flex; align-items: center; justify-content: center; }
+
+      .cake {
+        position: relative;
+        transform: scale(clamp(5, 8.5vw, 8.5));
+        transform-origin: center;
+        overflow: visible;
+        z-index: 1;
+        animation: cake 1s infinite;
+      }
+
+      /* ============================================================
+         CANDLES
+         ============================================================ */
+      /* .candle {
+        position: absolute;
+        width: 5px;
+        height: 12px;
+        background-color: #f5c842;
+        border-radius: 2px 2px 0 0;
+      }
+      .candle::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 6px;
+        height: 8px;
+        background: radial-gradient(ellipse at bottom, #ffd700 0%, #ff8c00 60%, #ff4500 100%);
+        border-radius: 50% 50% 30% 30%;
+        animation: flicker 0.3s ease-in-out infinite alternate;
+        transform-origin: bottom center;
+      }
+      .candle.blown::before {
+        display: none !important;
+      }
+      .candle.blown {
+        background-color: #999 !important;
+        transition: background-color 0.3s ease;
+      }
+
+      /* Candle colors */
+      /* .green-candle  { background-color: #4caf50; }
+      .purple-candle { background-color: #9c27b0; }
+      .blue-candle   { background-color: #2196f3; }
+      .yellow-candle { background-color: #f5c842; } */
+
+      @keyframes flicker {
+        0%   { transform: translateX(-50%) scaleX(1) scaleY(1) rotate(-2deg); }
+        100% { transform: translateX(-50%) scaleX(0.85) scaleY(1.1) rotate(2deg); }
+      }
+
+      /* ============================================================
+         MIC PERMISSION BUTTON
+         ============================================================ */
+      #mic-prompt {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+      }
+      #mic-prompt p {
+        font-size: 0.9rem;
+        color: #888;
+        max-width: 280px;
+        line-height: 1.5;
+        text-align: center;
+      } */
+
+      /* ============================================================
+         PIXEL CAKE ANIMATION (abbreviated — kept from style.css)
+         Injected inline below to avoid external file dependency
+         ============================================================ */
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="birthdayText"></div>
+
+      <!-- Mic permission prompt (shown before getUserMedia) -->
+      <div id="mic-prompt" style="display:none;">
+        <p>Allow microphone access to blow out the candles! 🎤</p>
+        <button
+          class="btn-interactive"
+          id="btn-allow-mic"
+          type="button"
+          aria-label="Allow microphone access"
+        >🎤 Allow Microphone</button>
+      </div>
+
+      <div class="cake-container">
+        <div class="cake" id="cake"></div>
+      </div>
+    </div>
+
+    <!-- Inline cake pixel-art keyframes (condensed from style.css) -->
+    <style id="cake-anim-style">
+      /* Placeholder — the real @keyframes cake block from style.css is massive.
+         We reference the external file if it exists, otherwise the cake still
+         renders via inline candle elements. The animation property is set on
+         .cake above; if style.css is present it will augment. */
+    </style>
+    <link rel="stylesheet" href="style.css" />
+
+    <script>
+      /* ============================================================
+         RIPPLE HELPER
+         ============================================================ */
+      function attachRipple(el) {
+        if (el._ripple) return;
+        el._ripple = true;
+
+        function fire(cx, cy) {
+          const rect = el.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height) * 1.6;
+          const r = document.createElement('span');
+          r.className = 'btn-ripple';
+          r.style.cssText = `
+            width:${size}px; height:${size}px;
+            left:${cx - rect.left - size / 2}px;
+            top:${cy - rect.top - size / 2}px;
+          `;
+          el.appendChild(r);
+          r.addEventListener('animationend', () => r.remove(), { once: true });
+        }
+
+        el.addEventListener('pointerdown', e => {
+          if (e.pointerType === 'mouse' && e.button !== 0) return;
+          el.dataset.pressed = 'true';
+          fire(e.clientX, e.clientY);
+        }, { passive: true });
+
+        const release = () => { el.dataset.pressed = 'false'; };
+        el.addEventListener('pointerup',     release, { passive: true });
+        el.addEventListener('pointercancel', release, { passive: true });
+        el.addEventListener('pointerleave',  release, { passive: true });
+
+        el.addEventListener('keydown', e => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            const rect = el.getBoundingClientRect();
+            fire(rect.left + rect.width / 2, rect.top + rect.height / 2);
+            el.click();
+          }
+        });
+      }
+
+      /* ============================================================
+         URL PARAMS
+         ============================================================ */
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get('name') || 'Friend';
+      let candleCount = parseInt(params.get('candles'), 10) || 4;
+      candleCount = Math.min(Math.max(candleCount, 1), 30);
+
+      /* ============================================================
+         BIRTHDAY TEXT
+         ============================================================ */
+      document.getElementById('birthdayText').innerHTML = `
+        <div id="mainTitle">Happy Birthday, ${name}!</div>
+        <div id="subTitle">Make a wish and blow the candles</div>
+      `;
+
+      /* ============================================================
+         CANDLE BUILD
+         ============================================================ */
+      const cake    = document.getElementById('cake');
+      const COLORS  = ['green-candle','purple-candle','blue-candle','yellow-candle'];
+      const CAKE_W  = 35;
+
+      function createCandles(count) {
+        cake.innerHTML = '';
+        const candlesPerRow = 6;
+        const shiftAmount   = 4;
+
+        for (let i = 0; i < count; i++) {
+          const candle = document.createElement('div');
+          candle.classList.add('candle', COLORS[Math.floor(Math.random() * COLORS.length)]);
+
+          const row   = Math.floor(i / candlesPerRow);
+          const col   = i % candlesPerRow;
+          const inRow = Math.min(candlesPerRow, count - row * candlesPerRow);
+          const rowSpacing = CAKE_W / (inRow + 1);
+          const leftBase   = rowSpacing * (col + 1) - 2.5 + 5;
+          const rowShift   = row % 2 === 0 ? 0 : shiftAmount;
+
+          candle.style.cssText = `
+            position:absolute;
+            top:${10 + row * 3}px;
+            left:${leftBase - rowShift + 4}px;
+          `;
+          cake.appendChild(candle);
+        }
+      }
+
+      createCandles(candleCount);
+
+      /* ============================================================
+         BLOW-OUT LOGIC
+         ============================================================ */
+      function blowOutCandles() {
+        const candles = document.querySelectorAll('.candle');
+        candles.forEach(c => {
+          const delay = Math.random() * 1000;
+          setTimeout(() => c.classList.add('blown'), delay);
+        });
+        setTimeout(() => {
+          const sub = document.getElementById('subTitle');
+          if (sub) sub.textContent = 'Yayy! Wishing you the happiest birthday ever!! 🎉';
+        }, 1200);
+      }
+
+      /* ============================================================
+         MICROPHONE DETECTION
+         ============================================================ */
+      let micStarted = false;
+
+      async function startMicDetection() {
+        if (micStarted) return;
+        micStarted = true;
+
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const source   = audioCtx.createMediaStreamSource(stream);
+          const analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 512;
+          source.connect(analyser);
+
+          const freqArr = new Uint8Array(analyser.frequencyBinCount);
+          const timeArr = new Uint8Array(analyser.frequencyBinCount);
+          let blown = false;
+
+          function detect() {
+            analyser.getByteFrequencyData(freqArr);
+            analyser.getByteTimeDomainData(timeArr);
+
+            let hiSum = 0, loSum = 0, rmsSum = 0;
+            const mid = freqArr.length / 2;
+            for (let i = 0; i < freqArr.length; i++) {
+              if (i < mid) loSum += freqArr[i]; else hiSum += freqArr[i];
+              const n = (timeArr[i] - 128) / 128;
+              rmsSum += n * n;
+            }
+            const hiAvg  = hiSum / mid;
+            const loAvg  = loSum / mid;
+            const rms    = Math.sqrt(rmsSum / timeArr.length) * 100;
+            const ratio  = hiAvg / (loAvg + 1);
+
+            if (!blown && rms > 8 && ratio > 0.18 && loAvg > 18) {
+              blown = true;
+              blowOutCandles();
+            }
+            requestAnimationFrame(detect);
+          }
+          detect();
+
+          // Hide mic prompt once permission granted
+          const prompt = document.getElementById('mic-prompt');
+          if (prompt) prompt.style.display = 'none';
+
+        } catch (err) {
+          console.warn('Mic access denied or unavailable:', err);
+          micStarted = false;
+          // Show mic prompt for user to retry
+          const prompt = document.getElementById('mic-prompt');
+          if (prompt) prompt.style.display = 'flex';
+        }
+      }
+
+      /* ============================================================
+         MIC PROMPT BUTTON
+         ============================================================ */
+      const micBtn = document.getElementById('btn-allow-mic');
+      attachRipple(micBtn);
+
+      micBtn.addEventListener('pointerup', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        micStarted = false; // reset so we can retry
+        startMicDetection();
+      });
+
+      /* ============================================================
+         AUTO-START OR SHOW PROMPT
+         ============================================================ */
+      // Attempt auto-start on page load. If it fails, show the prompt.
+      window.addEventListener('load', () => {
+        startMicDetection();
+      });
+    </script>
+  </body>
+</html>
