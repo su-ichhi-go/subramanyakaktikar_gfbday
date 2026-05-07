@@ -384,7 +384,7 @@ body {
 </head>
 <body>
   <div class="page">
-    <h1 class="page-title">More Memories in Poker Cards</h1>
+    <h1 class="page-title">Memories</h1>
     <p class="description">Tap any card to reveal the photo. Drag cards to rearrange them — or just enjoy the memories.</p>
     <div class="deck" id="deck"></div>
     <div class="actions">
@@ -528,7 +528,7 @@ popupClose.addEventListener('pointerup', e => {
 popupReturn.addEventListener('pointerup', e => {
   e.stopPropagation();
   closePopup();
-  setTimeout(() => { window.location.href = 'newww.html#slideshow'; }, 100);
+  setTimeout(() => { window.location.href = './newww.html#slideshow'; }, 100);
 });
 
 document.addEventListener('keydown', e => {
@@ -649,12 +649,12 @@ cards.forEach((item, index) => {
    ============================================================ */
 document.getElementById('back-btn').addEventListener('pointerup', e => {
   e.preventDefault();
-  window.location.href = 'newww.html#slideshow';
+  window.location.href = './newww.html#slideshow';
 });
 
 document.getElementById('home-btn').addEventListener('pointerup', e => {
   e.preventDefault();
-  window.location.href = 'newww.html';
+  window.location.href = './newww.html';
 });
 
 /* ============================================================
