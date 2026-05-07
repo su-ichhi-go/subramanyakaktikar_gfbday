@@ -814,6 +814,7 @@ body {
 <!-- ============================================================
      SCENE 3: MEMORY SLIDESHOW
      ============================================================ -->
+<a id="slideshow" aria-hidden="true"></a>
 <section class="scene" id="scene-slideshow" aria-label="Memory slideshow">
   <div class="slideshow-wrapper">
     <h2 class="slideshow-title">Our Beautiful Moments 🌸</h2>
@@ -925,6 +926,7 @@ const isMobile = isMobileUA();
 
 if (isTouch) document.body.classList.add('touch-device');
 
+document.documentElement.style.overscrollBehavior = 'none';
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ============================================================
@@ -1055,7 +1057,7 @@ function initCountdownScene() {
 }
 
 window.addEventListener('load', () => {
-  const hash = window.location.hash.replace('#', '');
+  const hash = normalizeSceneHash(window.location.hash.replace('#', ''));
   const valid = ['countdown','letter','slideshow','thankyou','surprise'];
   if (hash && valid.includes(hash)) {
     goToScene(hash);
@@ -1066,7 +1068,7 @@ window.addEventListener('load', () => {
 });
 
 window.addEventListener('hashchange', () => {
-  const hash = window.location.hash.replace('#', '');
+  const hash = normalizeSceneHash(window.location.hash.replace('#', ''));
   const valid = ['countdown','letter','slideshow','thankyou','surprise'];
   if (hash && valid.includes(hash)) goToScene(hash);
 });
@@ -1086,11 +1088,13 @@ function wireBtn(id, action) {
   btn.addEventListener('click', action);
 }
 
+const normalizeSceneHash = hash => hash.replace(/^scene-/, '');
+
 // ── Scene navigation buttons ──
 wireBtn('btn-begin',         () => goToScene('letter'));
 wireBtn('btn-memories',      () => goToScene('slideshow'));
 // Poker button removed - animation integrated into slides
-wireBtn('btn-poker',         () => { window.open('poker-cards.html', '_blank'); });
+wireBtn('btn-poker',         () => { window.location.href = 'poker-cards.html'; });
 wireBtn('btn-next-surprise', () => goToScene('thankyou'));
 wireBtn('btn-last-surprise', () => goToScene('surprise'));
 wireBtn('restart-btn',       () => goToScene('countdown'));
